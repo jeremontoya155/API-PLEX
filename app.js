@@ -3,6 +3,7 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const medicamentosRouter = require('./routes/medicamentos');
+const ventasRouter = require('./routes/ventas'); // Nueva ruta para ventas
 const dotenv = require('dotenv');
 
 // Cargar variables de entorno desde .env
@@ -17,6 +18,10 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
   allowedHeaders: ['Content-Type', 'Authorization'] // Encabezados permitidos
 }));
+
+
+// Servir archivos estáticos desde la carpeta 'public'
+app.use(express.static('public'));
 
 // Configuración de la conexión a MySQL desde variables de entorno
 const pool = mysql.createPool({
@@ -51,8 +56,9 @@ const checkApiKey = (req, res, next) => {
   }
 };
 
-// Aplicar el middleware de la clave API solo en las rutas de medicamentos
+// Aplicar el middleware de la clave API solo en las rutas de medicamentos y ventas
 app.use('/medicamentos', checkApiKey, medicamentosRouter);
+app.use('/ventas', checkApiKey, ventasRouter); // Aplicar el middleware de clave API a la ruta de ventas
 
 // Establecer el puerto desde la variable de entorno o usar el 3000 por defecto
 const PORT = process.env.PORT || 3000;

@@ -112,7 +112,7 @@
   <div class="container">
     <h1>API Medicamentos - Documentación</h1>
 
-    <p>Bienvenido a la API de medicamentos. A continuación, te mostramos cómo puedes realizar consultas a esta API. Recuerda que para acceder a los datos de medicamentos, debes proporcionar una clave API válida en el encabezado <code>Authorization</code> de tu solicitud.</p>
+    <p>Bienvenido a la API de medicamentos. A continuación, te mostramos cómo puedes realizar consultas a esta API. Recuerda que para acceder a los datos de medicamentos y ventas, debes proporcionar una clave API válida en el encabezado <code>Authorization</code> de tu solicitud.</p>
 
     <div class="note">
       <p><strong>Nota:</strong> Asegúrate de que estás utilizando la clave API correcta, de lo contrario recibirás un error <code>403 Forbidden</code>.</p>
@@ -123,16 +123,38 @@
       <li><strong>Obtener todos los medicamentos:</strong> <code>GET /medicamentos</code></li>
       <li><strong>Obtener un medicamento por <code>CodPlex</code>:</strong> <code>GET /medicamentos/:CodPlex</code></li>
       <li><strong>Buscar medicamentos por coincidencia parcial de código de barras:</strong> <code>GET /medicamentos/buscar/codigo-de-barras?codebar=valor</code></li>
+      <li><strong>Obtener todas las ventas:</strong> <code>GET /ventas</code></li>
+      <li><strong>Obtener ventas por producto:</strong> <code>GET /ventas?idProducto=valor</code></li>
     </ul>
 
     <h3>Ejemplo de Solicitud con <code>curl</code></h3>
     <pre>
 curl -H "Authorization: mi_clave_secreta" http://localhost:3000/medicamentos
+curl -H "Authorization: mi_clave_secreta" http://localhost:3000/ventas
+curl -H "Authorization: mi_clave_secreta" "http://localhost:3000/ventas?idProducto=12345"
     </pre>
 
     <h3>Ejemplo de Solicitud con <code>fetch</code></h3>
     <pre>
 fetch('http://localhost:3000/medicamentos/buscar/codigo-de-barras?codebar=1234', {
+  headers: {
+    'Authorization': 'mi_clave_secreta'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));
+
+fetch('http://localhost:3000/ventas', {
+  headers: {
+    'Authorization': 'mi_clave_secreta'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));
+
+fetch('http://localhost:3000/ventas?idProducto=12345', {
   headers: {
     'Authorization': 'mi_clave_secreta'
   }
@@ -148,3 +170,4 @@ fetch('http://localhost:3000/medicamentos/buscar/codigo-de-barras?codebar=1234',
   </div>
 </body>
 </html>
+
