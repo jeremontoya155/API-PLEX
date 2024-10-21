@@ -4,14 +4,13 @@ const router = express.Router();
 
 // Obtener todas las ventas o ventas de un producto en particular
 router.get('/', async (req, res) => {
-  const { idProducto } = req.query;
+  const { idProducto } = req.query; // Capturar el idProducto de los parámetros de consulta
 
   try {
     // Conexión a la base de datos desde el middleware
     const pool = req.pool;
 
-    // Primera consulta: ventas entre el 25/09/2024 y el 06/10/2024
-    const query1 = `
+    let query1 = `
       SELECT 
         factlineas.IDProducto,
         factlineas.Detalle,  
@@ -26,13 +25,9 @@ router.get('/', async (req, res) => {
         factcabecera.Emision BETWEEN '2024-09-25' AND '2024-10-06'
       AND 
         factcabecera.Tipo IN ('FV', 'NC')
-      ${idProducto ? `AND factlineas.IDProducto = ${idProducto}` : ''}
-      GROUP BY 
-        factlineas.IDProducto;
     `;
 
-    // Segunda consulta: ventas desde el 07/10/2024 hasta la fecha actual
-    const query2 = `
+    let query2 = `
       SELECT 
         factlineas.IDProducto,
         factlineas.Detalle,
@@ -51,10 +46,16 @@ router.get('/', async (req, res) => {
         factcabecera.Emision BETWEEN '2024-10-07' AND CURDATE()
       AND 
         factcabecera.Tipo IN ('FV', 'NC')
-      ${idProducto ? `AND factlineas.IDProducto = ${idProducto}` : ''}
-      GROUP BY 
-        factlineas.IDProducto;
     `;
+
+    // Si hay idProducto en la query, añadir la condición de filtro
+    if (idProducto) {
+      query1 += ` AND factlineas.IDProducto = ${idProducto} GROUP BY factlineas.IDProducto;`;
+      query2 += ` AND factlineas.IDProducto = ${idProducto} GROUP BY factlineas.IDProducto;`;
+    } else {
+      query1 += ` GROUP BY factlineas.IDProducto;`;
+      query2 += ` GROUP BY factlineas.IDProducto;`;
+    }
 
     // Ejecutar las consultas
     const [rows1] = await pool.query(query1);
@@ -63,9 +64,9 @@ router.get('/', async (req, res) => {
     // Concatenar los resultados de ambas consultas
     const ventas = [...rows1, ...rows2];
 
-    // Verificar si hay resultados
+    // Si no hay ventas, devolver error 404
     if (ventas.length === 0) {
-      return res.status(404).json({ error: 'No se encontraron ventas para el producto' });
+      return res.status(404).json({ error: 'No se encontraron ventas' });
     }
 
     // Agrupar por IDProducto, sumar las cantidades si hay ventas repetidas
