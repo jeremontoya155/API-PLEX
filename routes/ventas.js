@@ -10,6 +10,7 @@ router.get('/', async (req, res) => {
     // Conexión a la base de datos desde el middleware
     const pool = req.pool;
 
+    // Primera consulta: ventas entre el 25/09/2024 y el 06/10/2024
     let query1 = `
       SELECT 
         factlineas.IDProducto,
@@ -27,6 +28,7 @@ router.get('/', async (req, res) => {
         factcabecera.Tipo IN ('FV', 'NC')
     `;
 
+    // Segunda consulta: ventas desde el 07/10/2024 hasta la fecha actual
     let query2 = `
       SELECT 
         factlineas.IDProducto,
@@ -48,18 +50,18 @@ router.get('/', async (req, res) => {
         factcabecera.Tipo IN ('FV', 'NC')
     `;
 
-    // Si hay idProducto en la query, añadir la condición de filtro
+    // Si se especifica un idProducto, añadir la condición para filtrarlo
     if (idProducto) {
-      query1 += ` AND factlineas.IDProducto = ${idProducto} GROUP BY factlineas.IDProducto;`;
-      query2 += ` AND factlineas.IDProducto = ${idProducto} GROUP BY factlineas.IDProducto;`;
+      query1 += ` AND factlineas.IDProducto = ? GROUP BY factlineas.IDProducto;`;
+      query2 += ` AND factlineas.IDProducto = ? GROUP BY factlineas.IDProducto;`;
     } else {
       query1 += ` GROUP BY factlineas.IDProducto;`;
       query2 += ` GROUP BY factlineas.IDProducto;`;
     }
 
-    // Ejecutar las consultas
-    const [rows1] = await pool.query(query1);
-    const [rows2] = await pool.query(query2);
+    // Ejecutar las consultas con o sin parámetro de idProducto
+    const [rows1] = await pool.query(query1, [idProducto]);
+    const [rows2] = await pool.query(query2, [idProducto]);
 
     // Concatenar los resultados de ambas consultas
     const ventas = [...rows1, ...rows2];
@@ -80,7 +82,12 @@ router.get('/', async (req, res) => {
       return acc;
     }, []);
 
-    // Devolver los resultados como respuesta JSON
+    // Si hay un idProducto, devolver solo la primera línea de resultados de ese producto
+    if (idProducto) {
+      return res.json(ventasAgrupadas[0]);
+    }
+
+    // Devolver todos los resultados si no hay idProducto
     res.json(ventasAgrupadas);
 
   } catch (error) {
