@@ -129,14 +129,15 @@
 
     <h3>Ejemplo de Solicitud con <code>curl</code></h3>
     <pre>
-curl -H "Authorization: mi_clave_secreta" http://localhost:3000/medicamentos
-curl -H "Authorization: mi_clave_secreta" http://localhost:3000/ventas
-curl -H "Authorization: mi_clave_secreta" "http://localhost:3000/ventas?idProducto=12345"
+curl -H "Authorization: mi_clave_secreta" https://api-plex-production.up.railway.app/medicamentos
+curl -H "Authorization: mi_clave_secreta" https://api-plex-production.up.railway.app/ventas
+curl -H "Authorization: mi_clave_secreta" "https://api-plex-production.up.railway.app/ventas?idProducto=12345"
+curl -H "Authorization: mi_clave_secreta" "https://api-plex-production.up.railway.app/ventas?idProducto=12345"
     </pre>
 
     <h3>Ejemplo de Solicitud con <code>fetch</code></h3>
     <pre>
-fetch('http://localhost:3000/medicamentos/buscar/codigo-de-barras?codebar=1234', {
+fetch('https://api-plex-production.up.railway.app/medicamentos/buscar/codigo-de-barras?codebar=1234', {
   headers: {
     'Authorization': 'mi_clave_secreta'
   }
@@ -145,7 +146,7 @@ fetch('http://localhost:3000/medicamentos/buscar/codigo-de-barras?codebar=1234',
 .then(data => console.log(data))
 .catch(error => console.error('Error:', error));
 
-fetch('http://localhost:3000/ventas', {
+fetch('https://api-plex-production.up.railway.app/ventas', {
   headers: {
     'Authorization': 'mi_clave_secreta'
   }
@@ -154,7 +155,7 @@ fetch('http://localhost:3000/ventas', {
 .then(data => console.log(data))
 .catch(error => console.error('Error:', error));
 
-fetch('http://localhost:3000/ventas?idProducto=12345', {
+fetch('https://api-plex-production.up.railway.app/ventas?idProducto=12345', {
   headers: {
     'Authorization': 'mi_clave_secreta'
   }
